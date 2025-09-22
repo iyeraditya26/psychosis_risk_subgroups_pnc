@@ -1,0 +1,260 @@
+---
+title: "SBM fitting"
+output: html_notebook
+---
+
+```{r include=FALSE}
+# Install the required packages
+install.packages("resources/sbm_0.4.7.tar.gz", repos = NULL, type = "source")
+```
+
+```{r include=FALSE}
+# Import libraries
+library(sbm);
+```
+
+```{r include=FALSE}
+# Load matrices
+
+# Youth symptom layer
+youth_symptom_df <- read.csv("results/youth_symptom_matrix.csv");
+youth_symptom_matrix <- data.matrix(youth_symptom_df);
+
+# Youth neuroimaging layer (constructed using pairwise Pearson dissimilarities)
+youth_neuroimaging_Pearson_df <- read.csv("results/youth_neuroimaging_Pearson_matrix.csv");
+youth_neuroimaging_Pearson_matrix <- data.matrix(youth_neuroimaging_Pearson_df);
+
+# Youth neuroimaging layer (constructed using pairwise Euclidean distances)
+youth_neuroimaging_Euclidean_df <- read.csv("results/youth_neuroimaging_Euclidean_matrix.csv");
+youth_neuroimaging_Euclidean_matrix <- data.matrix(youth_neuroimaging_Euclidean_df);
+
+
+# Early adult symptom layer
+early_adult_symptom_df <- read.csv("results/early_adult_symptom_matrix.csv");
+early_adult_symptom_matrix <- data.matrix(early_adult_symptom_df);
+
+# Early adult neuroimaging layer (constructed using pairwise Pearson dissimilarities)
+early_adult_neuroimaging_Pearson_df <- read.csv("results/early_adult_neuroimaging_Pearson_matrix.csv");
+early_adult_neuroimaging_Pearson_matrix <- data.matrix(early_adult_neuroimaging_Pearson_df);
+
+# Early adult neuroimaging layer (constructed using pairwise Euclidean distances)
+early_adult_neuroimaging_Euclidean_df <- read.csv("results/early_adult_neuroimaging_Euclidean_matrix.csv");
+early_adult_neuroimaging_Euclidean_matrix <- data.matrix(early_adult_neuroimaging_Euclidean_df);
+```
+
+```{r include=FALSE}
+# Function for retrieving the index of the highest probability from a vector of probabilities
+highest_prob_index <- function(probs) {
+  max_prob <- max(probs);
+  max_prob_indices <- which(probs == max_prob);
+  if(length(max_prob_indices) > 1){
+    return(sample(max_prob_indices, 1));
+  }
+  else {
+    return(max_prob_indices);
+  }
+}
+
+# Function for obtaining the number of nodes (i.e. subjects) in each block
+membership_counts <- function(memberships) {
+  counts <- table(memberships);
+  return(as.numeric(counts));
+}
+```
+
+```{r include=FALSE}
+# Function for fitting a multiplex SBM to the data
+fitMultiplexSBM <- function(A1, A2, dependent=FALSE, nbBlocksRange=list(c(1,7)),
+                            results_filepath=NULL, memberships_filepath=NULL,
+                            parameters_filepath=NULL, stored_models_filepath=NULL
+                            ) {
+  
+  listSBM = c(defineSBM(A1, model="gaussian", dimLabels=" "),
+              defineSBM(A2, model="gaussian", dimLabels=" "));
+  
+  estimOptions=list(nbBlocksRange=nbBlocksRange);
+  
+  Results = estimateMultiplexSBM(listSBM, dependent=dependent, estimOptions=estimOptions);
+  
+  if (length(Results$probMemberships[[1]][1,]) != length(Results$indMemberships[[1]][1,])) {
+    memberships = apply(Results$probMemberships[[1]], 1, highest_prob_index);
+  }
+  else {
+    memberships = Results$memberships;
+  }
+  
+  if (!is.null(results_filepath)) {
+    saveRDS(Results, file=results_filepath);
+  }
+  
+  if (!is.null(memberships_filepath)) {
+    write.csv(data.frame(memberships), memberships_filepath, row.names=FALSE);
+  }
+  
+  if (!is.null(parameters_filepath)) {
+    n = membership_counts(memberships);
+    df <- data.frame(Block = 1:Results$nbBlocks,
+                     n = n,
+                     loglik = Results$loglik,
+                     ICL = Results$ICL);
+    write.csv(df, parameters_filepath, row.names=FALSE);
+  }
+  
+  if (!is.null(stored_models_filepath)) {
+    write.csv(Results$storedModels, stored_models_filepath, row.names=FALSE);
+  }
+  
+  return(Results);
+}
+```
+
+```{r include=FALSE}
+# Function for fitting a simple SBM to the data
+fitSimpleSBM <- function(A, nbBlocksRange=list(c(2,50)),
+                         results_filepath=NULL, memberships_filepath=NULL,
+                         parameters_filepath=NULL, means_filepath=NULL,
+                         stored_models_filepath=NULL) {
+  
+  estimOptions=list(nbBlocksRange);
+  
+  Results = estimateSimpleSBM(A, model='gaussian', dimLabels=" ", directed=TRUE, estimOptions=estimOptions);
+  
+  if (length(Results$probMemberships[1,]) != length(Results$indMemberships[1,])) {
+    memberships = apply(Results$probMemberships, 1, highest_prob_index);
+  }
+  else {
+    memberships = Results$memberships;
+  }
+  
+  if (!is.null(results_filepath)) {
+    saveRDS(Results, file=results_filepath);
+  }
+  
+  if (!is.null(memberships_filepath)) {
+    write.csv(data.frame(memberships), memberships_filepath, row.names=FALSE);
+  }
+  
+  if (!is.null(parameters_filepath)) {
+    n = membership_counts(memberships);
+    df <- data.frame(Block = 1:Results$nbBlocks,
+                     n = n,
+                     loglik = Results$loglik,
+                     ICL = Results$ICL);
+    write.csv(df, parameters_filepath, row.names=FALSE);
+  }
+  
+  if (!is.null(means_filepath)) {
+    write.csv(Results$connectParam$mean, means_filepath, row.names=TRUE);
+  }
+  
+  if (!is.null(stored_models_filepath)) {
+    write.csv(Results$storedModels, stored_models_filepath, row.names=FALSE);
+  }
+  
+  return(Results);
+}
+```
+
+```{r include=FALSE}
+# Set the seed to 1234 to reproduce the results
+set.seed(1234);
+
+# Fit a multiplex SBM for the youth sample with the neuroimaging layer constructed using pairwise Pearson dissimilarities
+Results = fitMultiplexSBM(youth_neuroimaging_Pearson_matrix, youth_symptom_matrix,
+                 results_filepath = "results/youth_multiplex_Pearson_results.RDS",
+                 memberships_filepath = "results/youth_multiplex_Pearson_memberships.csv",
+                 parameters_filepath = "results/youth_multiplex_Pearson_parameters.csv",
+                 stored_models_filepath = "results/youth_multiplex_Pearson_stored_models.csv");
+```
+
+```{r include=FALSE}
+# View the results from the fitting of the model
+Results$ICL
+```
+
+```{r include=FALSE}
+# Set the seed to 1234 to reproduce the results
+set.seed(1234);
+
+# Fit a multiplex SBM for the early adult sample with the neuroimaging layer constructed using pairwise Pearson dissimilarities
+Results = fitMultiplexSBM(early_adult_neuroimaging_Pearson_matrix, early_adult_symptom_matrix,
+                 results_filepath = "results/early_adult_multiplex_Pearson_results.RDS",
+                 memberships_filepath = "results/early_adult_multiplex_Pearson_memberships.csv",
+                 parameters_filepath = "results/early_adult_multiplex_Pearson_parameters.csv",
+                 stored_models_filepath = "results/early_adult_multiplex_Pearson_stored_models.csv");
+```
+
+```{r include=FALSE}
+# View the results from the fitting of the model
+Results$ICL
+```
+
+```{r include=FALSE}
+# Set the seed to 1234 to reproduce the results
+set.seed(1234);
+
+# Fit a multiplex SBM for the youth sample with the neuroimaging layer constructed using pairwise Euclidean distances
+Results = fitMultiplexSBM(youth_neuroimaging_Euclidean_matrix, youth_symptom_matrix,
+                 results_filepath = "results/youth_multiplex_Euclidean_results.RDS",
+                 memberships_filepath = "results/youth_multiplex_Euclidean_memberships.csv",
+                 parameters_filepath = "results/youth_multiplex_Euclidean_parameters.csv",
+                 stored_models_filepath = "results/youth_multiplex_Euclidean_stored_models.csv");
+```
+
+```{r include=FALSE}
+# View the results from the fitting of the model
+Results$ICL
+```
+
+```{r include=FALSE}
+# Set the seed to 1234 to reproduce the results
+set.seed(1234);
+
+# Fit a multiplex SBM for the early adult sample with the neuroimaging layer constructed using pairwise Euclidean distances
+Results = fitMultiplexSBM(early_adult_neuroimaging_Euclidean_matrix, early_adult_symptom_matrix,
+                 results_filepath = "results/early_adult_multiplex_Euclidean_results.RDS",
+                 memberships_filepath = "results/early_adult_multiplex_Euclidean_memberships.csv",
+                 parameters_filepath = "results/early_adult_multiplex_Euclidean_parameters.csv",
+                 stored_models_filepath = "results/early_adult_multiplex_Euclidean_stored_models.csv");
+```
+
+```{r include=FALSE}
+# View the results from the fitting of the model
+Results$ICL
+```
+
+```{r include=FALSE}
+# Set the seed to 1234 to reproduce the results
+set.seed(1234);
+
+# Fit a simple SBM for the youth sample using only the symptom layer
+Results = fitSimpleSBM(youth_symptom_matrix,
+                 results_filepath = "results/youth_simple_results.RDS",
+                 memberships_filepath = "results/youth_simple_memberships.csv",
+                 parameters_filepath = "results/youth_simple_parameters.csv",
+                 means_filepath = "results/youth_simple_means.csv",
+                 stored_models_filepath = "results/youth_simple_stored_models.csv");
+```
+
+```{r include=FALSE}
+# View the results from the fitting of the model
+Results$ICL
+```
+
+```{r include=FALSE}
+# Set the seed to 1234 to reproduce the results
+set.seed(1234);
+
+# Fit a simple SBM for the early adult sample using only the symptom layer
+Results = fitSimpleSBM(early_adult_symptom_matrix,
+                 results_filepath = "results/early_adult_simple_results.RDS",
+                 memberships_filepath = "results/early_adult_simple_memberships.csv",
+                 parameters_filepath = "results/early_adult_simple_parameters.csv",
+                 means_filepath = "results/early_adult_simple_means.csv",
+                 stored_models_filepath = "results/early_adult_simple_stored_models.csv");
+```
+
+```{r include=FALSE}
+# View the results from the fitting of the model
+Results$ICL
+```
