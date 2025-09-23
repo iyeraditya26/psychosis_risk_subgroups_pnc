@@ -4,13 +4,15 @@ This repository contains the code for the analyses presented in the paper, "Sali
 ## Directory Descriptions
 
 ### notebooks/
-Jupyter and RStudio notebooks used to run the analyses
-* : constructs the neuroimaging layer from functional connectivity matrices
-* : constructs the symptom layer from self-reported psychosis risk symptom data
-* : fits a multiplex Stochastic Block Model (SBM) to the neuroimaging and symptom layers
-* : fits a simple SBM to only the symptom layer
-* : Computes brain system segregation values for each subject
-* : 
+Jupyter and RStudio notebooks used to run the analyses. Run the notebooks in the listed order to reproduce the results.
+* create_neuroimaging_layers.ipynb: constructs the neuroimaging layer from functional connectivity matrices
+* create_symptom_layers.ipynb: constructs the symptom layer from self-reported psychosis risk symptom data
+* SBM_fitting.Rmd: fits all Stochastic Block Models (both simple and multiplex) that were used in the analyses.
+* symptom_analysis.ipynb: produces tables .
+* segregation_analysis.ipynb: Computes, describes, and visualizes brain system segregation values for each subject, breaking down these values by age group and the identified subject communities.
+* general_analysis_results.ipynb: .
+* sensitivity_analysis_results.ipynb: .
+* community_detection_concordance_analysis.ipynb: .
 
 ### src/
 Source code for functions used by the notebooks
@@ -19,3 +21,6 @@ Source code for functions used by the notebooks
 
 ### results/
 Output directory for the results produced by the notebooks
+
+### resources/
+
