@@ -4,7 +4,7 @@ This repository contains the code for the analyses presented in the paper, "Sali
 ## Directory Descriptions
 
 ### notebooks/
-Jupyter and RStudio notebooks used to run the analyses. Run the notebooks in the listed order to reproduce the results.
+Jupyter and RStudio notebooks used to run the analyses and generate visualizations presented in the figures. Run the notebooks in the listed order to reproduce the results.
 * create_neuroimaging_layers.ipynb: constructs the neuroimaging layer from functional connectivity matrices
 * create_symptom_layers.ipynb: constructs the symptom layer from self-reported psychosis risk symptom data
 * SBM_fitting.Rmd: fits all Stochastic Block Models (both simple and multiplex) that were used in the analyses.
