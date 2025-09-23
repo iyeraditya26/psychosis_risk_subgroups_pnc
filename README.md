@@ -16,11 +16,13 @@ Jupyter and RStudio notebooks used to run the analyses. Run the notebooks in the
 
 ### src/
 Source code for functions used by the notebooks
-* : 
-* : 
+* distance_FC.py: .
+* neuroimaging_layer_constructor.py: .
+* symptom_layer_constructor.py: .
+* table_generator.py: .
 
 ### results/
 Output directory for the results produced by the notebooks
 
 ### resources/
-
+Miscellaneous files that are referenced or implemented in the analysis notebooks.
