@@ -10,16 +10,16 @@ Jupyter and RStudio notebooks used to run the analyses and generate visualizatio
 * SBM_fitting.Rmd: fits all Stochastic Block Models (both simple and multiplex) that were used in the analyses.
 * symptom_analysis.ipynb: produces tables containing aggregated psychopathology symptom scores for each subject. Also performs permutation tests to assess the significance of between-block differences in SIP score means.
 * segregation_analysis.ipynb: Computes, describes, and visualizes brain system segregation values for each subject, breaking down these values by age group and the identified subject communities.
-* general_analysis_results.ipynb: Performs a wide range of analyses related to demographic information, psychopathology symptoms, and model fitting.
-* sensitivity_analysis_results.ipynb: Visualizes the parameter estimates and block-wise pychosis risk scores of the simple SBMs fit to only the symptom layer. It also visualizes the model fitting process for the simple SBM and the multiplex SBM fit to a nueroimaging layer constructed using pairwise Euclidean distances.
-* community_detection_concordance_analysis.ipynb: Performs analyses that evaluate the concordance between the community detection results from the simple and multiplex Stochastic Block Models.
+* general_analysis_results.ipynb: performs a wide range of analyses related to demographic information, psychopathology symptoms, and model fitting.
+* sensitivity_analysis_results.ipynb: visualizes the parameter estimates and block-wise pychosis risk scores of the simple SBMs fit to only the symptom layer. It also visualizes the model fitting process for the simple SBM and the multiplex SBM fit to a nueroimaging layer constructed using pairwise Euclidean distances.
+* community_detection_concordance_analysis.ipynb: performs analyses that evaluate the concordance between the community detection results from the simple and multiplex Stochastic Block Models.
 
 ### src/
 Source code for functions used by the notebooks
-* distance_FC.py: .
-* neuroimaging_layer_constructor.py: .
-* symptom_layer_constructor.py: .
-* table_generator.py: .
+* distance_FC.py: contains functions for computing the Pearson dissimilarities and Euclidean distances.
+* neuroimaging_layer_constructor.py: contains functions that help to construct the neuroimaging layers.
+* symptom_layer_constructor.py: contains functions that help to construct the symptom layers.
+* table_generator.py: contains functions that help to produce tables containing aggregated psychopathology symptom scores for each subject.
 
 ### results/
 Output directory for the results produced by the notebooks
