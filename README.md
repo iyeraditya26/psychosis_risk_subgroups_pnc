@@ -8,11 +8,11 @@ Jupyter and RStudio notebooks used to run the analyses and generate visualizatio
 * create_neuroimaging_layers.ipynb: constructs the neuroimaging layer from functional connectivity matrices
 * create_symptom_layers.ipynb: constructs the symptom layer from self-reported psychosis risk symptom data
 * SBM_fitting.Rmd: fits all Stochastic Block Models (both simple and multiplex) that were used in the analyses.
-* symptom_analysis.ipynb: produces tables .
+* symptom_analysis.ipynb: produces tables containing aggregated psychopathology symptom scores for each subject. Also performs permutation tests to assess the significance of between-block differences in SIP score means.
 * segregation_analysis.ipynb: Computes, describes, and visualizes brain system segregation values for each subject, breaking down these values by age group and the identified subject communities.
-* general_analysis_results.ipynb: .
-* sensitivity_analysis_results.ipynb: .
-* community_detection_concordance_analysis.ipynb: .
+* general_analysis_results.ipynb: Performs a wide range of analyses related to demographic information, psychopathology symptoms, and model fitting.
+* sensitivity_analysis_results.ipynb: Visualizes the parameter estimates and block-wise pychosis risk scores of the simple SBMs fit to only the symptom layer. It also visualizes the model fitting process for the simple SBM and the multiplex SBM fit to a nueroimaging layer constructed using pairwise Euclidean distances.
+* community_detection_concordance_analysis.ipynb: Performs analyses that evaluate the concordance between the community detection results from the simple and multiplex Stochastic Block Models.
 
 ### src/
 Source code for functions used by the notebooks
