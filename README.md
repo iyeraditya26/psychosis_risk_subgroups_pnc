@@ -15,7 +15,8 @@ Jupyter and RStudio notebooks used to run the analyses and generate visualizatio
 * community_detection_concordance_analysis.ipynb: performs analyses that evaluate the concordance between the community detection results from the simple and multiplex Stochastic Block Models.
 
 ### src/
-Source code for functions used by the notebooks
+Source code for functions used by the notebooks or for miscellaneous tasks
+* conn_batch_execute.m: MATLAB script that preprocesses each subject's fMRI data using the CONN pipeline. Note: this script was submitted multiple times (once per subject) as a SLURM job on a high performance compute cluster.
 * distance_FC.py: contains functions for computing the Pearson dissimilarities and Euclidean distances.
 * neuroimaging_layer_constructor.py: contains functions that help to construct the neuroimaging layers.
 * symptom_layer_constructor.py: contains functions that help to construct the symptom layers.
